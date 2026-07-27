@@ -34,7 +34,7 @@ Eseguibile e compatibile sia su **Linux** che su **Windows**.
 1. **Clona o scarica la repository**:
    ```bash
    git clone https://github.com/danielearrighi/pdf-a-convert
-   cd PDFA-Convert
+   cd pdf-a-convert
    ```
 
 2. **Crea un ambiente virtuale ed installa le dipendenze**:
@@ -68,7 +68,7 @@ L'eseguibile compilato verrà generato nella cartella `dist/`:
 ## 📐 Struttura del Progetto
 
 ```text
-PDFA-Convert/
+pdf-a-convert/
 ├── main.py                  # Entry point dell'applicazione
 ├── build_exe.py             # Script PyInstaller per la compilazione
 ├── requirements.txt         # Dipendenze Python (PyQt6, PyInstaller)
