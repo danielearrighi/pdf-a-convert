@@ -66,5 +66,13 @@ class ConfigManager:
     def theme(self, val: str):
         self.settings.setValue("theme", val)
 
+    @property
+    def output_suffix(self) -> str:
+        return self.settings.value("output_suffix", "-pdfa", type=str)
+
+    @output_suffix.setter
+    def output_suffix(self, val: str):
+        self.settings.setValue("output_suffix", val)
+
     def reset_to_defaults(self):
         self.settings.clear()

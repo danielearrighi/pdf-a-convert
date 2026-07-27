@@ -142,6 +142,17 @@ class SettingsDialog(QDialog):
         pdfa_field_layout.addWidget(self.pdfa_combo)
         options_layout.addLayout(pdfa_field_layout)
 
+        # Output Suffix row
+        suffix_field_layout = QVBoxLayout()
+        suffix_label = QLabel("Suffisso File Convertiti:")
+        
+        self.suffix_edit = QLineEdit(self.config.output_suffix)
+        self.suffix_edit.setPlaceholderText("Es. -pdfa oppure _pdfa")
+
+        suffix_field_layout.addWidget(suffix_label)
+        suffix_field_layout.addWidget(self.suffix_edit)
+        options_layout.addLayout(suffix_field_layout)
+
         # Extra Ghostscript args row
         extra_field_layout = QVBoxLayout()
         extra_label = QLabel("Argomenti Extra Ghostscript:")
@@ -283,6 +294,7 @@ class SettingsDialog(QDialog):
         self.gs_edit.setText(self.config.ghostscript_path)
         self.icc_edit.setText(self.config.icc_profile_path)
         self.pdfa_combo.setCurrentIndex(0)
+        self.suffix_edit.setText(self.config.output_suffix)
         self.extra_args_edit.setText("")
         self.theme_combo.setCurrentIndex(0)
 
@@ -290,6 +302,7 @@ class SettingsDialog(QDialog):
         self.config.ghostscript_path = self.gs_edit.text().strip()
         self.config.icc_profile_path = self.icc_edit.text().strip()
         self.config.pdfa_level = self.pdfa_combo.currentData()
+        self.config.output_suffix = self.suffix_edit.text().strip() or "-pdfa"
         self.config.extra_gs_args = self.extra_args_edit.text().strip()
         self.config.theme = self.theme_combo.currentData()
         if self.parent() and hasattr(self.parent(), "apply_theme"):

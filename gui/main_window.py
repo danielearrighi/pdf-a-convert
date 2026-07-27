@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QFrame, QMessageBox, QTextEdit, QDialog, QSizePolicy
 )
-from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtGui import QIcon, QFont, QPixmap
 
 from core.config import ConfigManager
 from core.converter import PDFConverterThread
@@ -47,8 +47,8 @@ class MainWindow(QMainWindow):
         self.last_output_file = ""
 
         self.setWindowTitle("PDF/A Converter - Pubblica Amministrazione")
-        self.setMinimumSize(540, 520)
-        self.resize(600, 580)
+        self.setMinimumSize(540, 580)
+        self.resize(600, 620)
 
         icon_path = get_asset_path("app_icon.png")
         if os.path.exists(icon_path):
@@ -66,11 +66,21 @@ class MainWindow(QMainWindow):
         header_frame.setObjectName("HeaderFrame")
         header_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         header_layout = QHBoxLayout(header_frame)
-        header_layout.setContentsMargins(0, 0, 0, 0)
+        header_layout.setContentsMargins(12, 10, 12, 10)
+        header_layout.setSpacing(14)
+
+        if os.path.exists(icon_path):
+            self.header_icon = QLabel()
+            pixmap = QPixmap(icon_path)
+            self.header_icon.setPixmap(
+                pixmap.scaled(44, 44, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            )
+            header_layout.addWidget(self.header_icon, 0, Qt.AlignmentFlag.AlignVCenter)
 
         header_titles = QVBoxLayout()
+        header_titles.setSpacing(2)
         self.title_label = QLabel("PDF/A Converter")
-        self.subtitle_label = QLabel("Conversione Standard PDF/A-1b per la Pubblica Amministrazione")
+        self.subtitle_label = QLabel("Conversione Standard PDF/A-1b per la PA")
         header_titles.addWidget(self.title_label)
         header_titles.addWidget(self.subtitle_label)
 
@@ -79,7 +89,7 @@ class MainWindow(QMainWindow):
         self.settings_btn.clicked.connect(self._open_settings)
 
         header_layout.addLayout(header_titles, stretch=1)
-        header_layout.addWidget(self.settings_btn)
+        header_layout.addWidget(self.settings_btn, 0, Qt.AlignmentFlag.AlignVCenter)
 
         main_layout.addWidget(header_frame, 0)
 
@@ -90,76 +100,58 @@ class MainWindow(QMainWindow):
         content_layout.setContentsMargins(8, 16, 8, 16)
         content_layout.setSpacing(16)
 
-        # Drop Area
+        # Drop Area (Espandibile per riempire lo spazio verticale fino al pulsante)
         self.drop_widget = DropAreaWidget()
-        self.drop_widget.file_selected.connect(self._on_file_selected)
-        content_layout.addWidget(self.drop_widget)
+        self.drop_widget.files_selected.connect(self._on_files_selected)
+        content_layout.addWidget(self.drop_widget, stretch=1)
 
         # Loader Widget (Hidden by default)
         self.loader_widget = LoaderWidget()
         self.loader_widget.hide()
-        content_layout.addWidget(self.loader_widget)
+        content_layout.addWidget(self.loader_widget, stretch=1)
 
-        # Action Convert Button
-        self.convert_btn = QPushButton("Converti in PDF/A-1b")
-        self.convert_btn.setObjectName("ConvertBtn")
-        self.convert_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.convert_btn.setEnabled(False)
-        self.convert_btn.clicked.connect(self._start_conversion)
-        content_layout.addWidget(self.convert_btn)
-
-        # 3. Success Banner (Hidden by default)
+        # 3. Success Banner (Hidden by default, allineato in alto)
         self.success_banner = QFrame()
         self.success_banner.setObjectName("SuccessBanner")
+        self.success_banner.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.success_banner.setMaximumHeight(250)
         success_layout = QVBoxLayout(self.success_banner)
-        success_layout.setContentsMargins(8, 16, 8, 16)
-        success_layout.setSpacing(10)
+        success_layout.setContentsMargins(14, 12, 14, 12)
+        success_layout.setSpacing(8)
         
         self.success_title = QLabel("🎉 Conversione completata con successo!")
-        self.success_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #166534;")
+        self.success_title.setStyleSheet("font-weight: bold; font-size: 15px; color: #166534;")
         
         self.success_path_label = QLabel("")
-        self.success_path_label.setStyleSheet("font-size: 13px; color: #15803D; margin-top: 2px; margin-bottom: 4px;")
+        self.success_path_label.setStyleSheet("font-size: 12px; color: #15803D; margin-top: 1px; margin-bottom: 2px;")
         self.success_path_label.setWordWrap(True)
         self.success_path_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
         success_actions = QHBoxLayout()
-        open_file_btn = QPushButton("📄 Apri File")
-        open_file_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        open_file_btn.setStyleSheet("""
+        self.open_file_btn = QPushButton("📄 Apri File")
+        self.open_file_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.open_file_btn.setStyleSheet("""
             QPushButton {
                 background-color: #166534; color: white; font-weight: bold;
-                border-radius: 6px; padding: 6px 12px; border: none;
+                border-radius: 6px; padding: 5px 12px; border: none; font-size: 12px;
             }
             QPushButton:hover { background-color: #14532D; }
         """)
-        open_file_btn.clicked.connect(self._open_output_file)
+        self.open_file_btn.clicked.connect(self._open_output_file)
 
-        open_folder_btn = QPushButton("📁 Apri Cartella")
-        open_folder_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        open_folder_btn.setStyleSheet("""
+        self.open_folder_btn = QPushButton("📁 Apri Cartella")
+        self.open_folder_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.open_folder_btn.setStyleSheet("""
             QPushButton {
                 background-color: #DCFCE7; color: #166534; font-weight: bold;
-                border-radius: 6px; padding: 6px 12px; border: 1px solid #86EFAC;
+                border-radius: 6px; padding: 5px 12px; border: 1px solid #86EFAC; font-size: 12px;
             }
             QPushButton:hover { background-color: #BBF7D0; }
         """)
-        open_folder_btn.clicked.connect(self._open_output_folder)
+        self.open_folder_btn.clicked.connect(self._open_output_folder)
 
-        convert_new_btn = QPushButton("🔄 Converti nuovo")
-        convert_new_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        convert_new_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #DCFCE7; color: #166534; font-weight: bold;
-                border-radius: 6px; padding: 6px 12px; border: 1px solid #86EFAC;
-            }
-            QPushButton:hover { background-color: #BBF7D0; }
-        """)
-        convert_new_btn.clicked.connect(self._reset_ui)
-
-        success_actions.addWidget(open_file_btn)
-        success_actions.addWidget(open_folder_btn)
-        success_actions.addWidget(convert_new_btn)
+        success_actions.addWidget(self.open_file_btn)
+        success_actions.addWidget(self.open_folder_btn)
         success_actions.addStretch()
 
         success_layout.addWidget(self.success_title)
@@ -167,20 +159,22 @@ class MainWindow(QMainWindow):
         success_layout.addLayout(success_actions)
         self.success_banner.hide()
 
-        content_layout.addWidget(self.success_banner)
+        content_layout.addWidget(self.success_banner, stretch=0)
 
-        # 4. Error Banner (Hidden by default)
+        # 4. Error Banner (Hidden by default, allineato in alto)
         self.error_banner = QFrame()
         self.error_banner.setObjectName("ErrorBanner")
+        self.error_banner.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.error_banner.setMaximumHeight(250)
         error_layout = QVBoxLayout(self.error_banner)
-        error_layout.setContentsMargins(8, 16, 8, 16)
-        error_layout.setSpacing(10)
+        error_layout.setContentsMargins(14, 12, 14, 12)
+        error_layout.setSpacing(8)
 
         self.error_title = QLabel("❌ Errore durante la conversione")
-        self.error_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #991B1B;")
+        self.error_title.setStyleSheet("font-weight: bold; font-size: 15px; color: #991B1B;")
 
         self.error_desc_label = QLabel("")
-        self.error_desc_label.setStyleSheet("font-size: 13px; color: #B91C1C; margin-top: 2px; margin-bottom: 4px;")
+        self.error_desc_label.setStyleSheet("font-size: 12px; color: #B91C1C; margin-top: 1px; margin-bottom: 2px;")
         self.error_desc_label.setWordWrap(True)
         self.error_desc_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
@@ -190,7 +184,7 @@ class MainWindow(QMainWindow):
         self.log_btn.setStyleSheet("""
             QPushButton {
                 background-color: #991B1B; color: white; font-weight: bold;
-                border-radius: 6px; padding: 6px 12px; border: none;
+                border-radius: 6px; padding: 5px 12px; border: none; font-size: 12px;
             }
             QPushButton:hover { background-color: #7F1D1D; }
         """)
@@ -198,19 +192,6 @@ class MainWindow(QMainWindow):
         self.log_btn.clicked.connect(self._show_log_dialog)
 
         error_actions.addWidget(self.log_btn)
-
-        convert_new_err_btn = QPushButton("🔄 Converti nuovo")
-        convert_new_err_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        convert_new_err_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #FEF2F2; color: #991B1B; font-weight: bold;
-                border-radius: 6px; padding: 6px 12px; border: 1px solid #FCA5A5;
-            }
-            QPushButton:hover { background-color: #FEE2E2; }
-        """)
-        convert_new_err_btn.clicked.connect(self._reset_ui)
-        error_actions.addWidget(convert_new_err_btn)
-
         error_actions.addStretch()
 
         error_layout.addWidget(self.error_title)
@@ -218,7 +199,21 @@ class MainWindow(QMainWindow):
         error_layout.addLayout(error_actions)
         self.error_banner.hide()
 
-        content_layout.addWidget(self.error_banner)
+        content_layout.addWidget(self.error_banner, stretch=0)
+
+        # Dynamic Spacer shown only during banner display to push convert_btn to bottom
+        self.banner_spacer = QWidget()
+        self.banner_spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.banner_spacer.hide()
+        content_layout.addWidget(self.banner_spacer, stretch=1)
+
+        # Action Convert Button (Blue)
+        self.convert_btn = QPushButton("Converti in PDF/A")
+        self.convert_btn.setObjectName("ConvertBtn")
+        self.convert_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.convert_btn.setEnabled(False)
+        self.convert_btn.clicked.connect(self._on_convert_btn_clicked)
+        content_layout.addWidget(self.convert_btn, stretch=0)
 
         main_layout.addWidget(content_container, stretch=1)
 
@@ -233,19 +228,20 @@ class MainWindow(QMainWindow):
         self.loader_widget.apply_theme(theme)
 
         if theme == Theme.DARK:
-            self.title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #F8FAFC;")
-            self.subtitle_label.setStyleSheet("font-size: 12px; color: #94A3B8;")
+            self.title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #FFFFFF;")
+            self.subtitle_label.setStyleSheet("font-size: 12px; color: #93C5FD;")
             self.settings_btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #1E293B;
-                    color: #F8FAFC;
-                    border: 1px solid #475569;
+                    background-color: #FFFFFF;
+                    color: #1E3A8A;
+                    border: none;
                     border-radius: 8px;
                     padding: 8px 14px;
                     font-weight: bold;
                 }
                 QPushButton:hover {
-                    background-color: #334155;
+                    background-color: #DBEAFE;
+                    color: #1E40AF;
                 }
             """)
             self.success_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #A7F3D0;")
@@ -253,19 +249,20 @@ class MainWindow(QMainWindow):
             self.error_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #FECACA;")
             self.error_desc_label.setStyleSheet("font-size: 13px; color: #FCA5A5; margin-top: 2px; margin-bottom: 4px;")
         else:
-            self.title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #0F172A;")
-            self.subtitle_label.setStyleSheet("font-size: 12px; color: #64748B;")
+            self.title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #FFFFFF;")
+            self.subtitle_label.setStyleSheet("font-size: 12px; color: #DBEAFE;")
             self.settings_btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #F8FAFC;
-                    color: #334155;
-                    border: 1px solid #CBD5E1;
+                    background-color: #FFFFFF;
+                    color: #1D4ED8;
+                    border: none;
                     border-radius: 8px;
                     padding: 8px 14px;
                     font-weight: bold;
                 }
                 QPushButton:hover {
-                    background-color: #E2E8F0;
+                    background-color: #EFF6FF;
+                    color: #1E40AF;
                 }
             """)
             self.success_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #166534;")
@@ -273,19 +270,35 @@ class MainWindow(QMainWindow):
             self.error_title.setStyleSheet("font-weight: bold; font-size: 16px; color: #991B1B;")
             self.error_desc_label.setStyleSheet("font-size: 13px; color: #B91C1C; margin-top: 2px; margin-bottom: 4px;")
 
-    def _on_file_selected(self, file_path: str):
+    def _on_files_selected(self, file_paths: list[str]):
         self.success_banner.hide()
         self.error_banner.hide()
-        self.convert_btn.setEnabled(bool(file_path))
+        self.banner_spacer.hide()
+        count = len(file_paths)
+        if count == 0:
+            self.convert_btn.setText("Converti in PDF/A")
+            self.convert_btn.setEnabled(False)
+        elif count == 1:
+            self.convert_btn.setText("Converti in PDF/A")
+            self.convert_btn.setEnabled(True)
+        else:
+            self.convert_btn.setText(f"Converti File in PDF/A ({count})")
+            self.convert_btn.setEnabled(True)
+
+    def _on_convert_btn_clicked(self):
+        if self.success_banner.isVisible() or self.error_banner.isVisible():
+            self._reset_ui()
+        else:
+            self._start_conversion()
 
     def _open_settings(self):
         dialog = SettingsDialog(self.config, self)
         dialog.exec()
 
     def _start_conversion(self):
-        input_file = self.drop_widget.current_file_path
-        if not input_file or not os.path.isfile(input_file):
-            QMessageBox.warning(self, "Attenzione", "Seleziona un file PDF valido prima di procedere.")
+        input_files = self.drop_widget.current_files
+        if not input_files:
+            QMessageBox.warning(self, "Attenzione", "Seleziona almeno un file PDF valido prima di procedere.")
             return
 
         gs_path = self.config.ghostscript_path
@@ -304,38 +317,65 @@ class MainWindow(QMainWindow):
         self.convert_btn.hide()
         self.success_banner.hide()
         self.error_banner.hide()
+        self.banner_spacer.hide()
 
-        self.loader_widget.set_status("Avvio del processo Ghostscript...")
+        count = len(input_files)
+        status_init = f"Avvio conversione per {count} file..." if count > 1 else "Avvio del processo Ghostscript..."
+        self.loader_widget.set_progress_step(0, count, status_init)
         self.loader_widget.show()
 
         # Launch worker thread
         self.converter_thread = PDFConverterThread(
-            input_file=input_file,
+            input_files=input_files,
             gs_path=gs_path,
             icc_path=self.config.icc_profile_path,
             pdfa_level=self.config.pdfa_level,
             extra_args=self.config.extra_gs_args,
+            output_suffix=self.config.output_suffix,
             parent=self
         )
         self.converter_thread.progress.connect(self.loader_widget.set_status)
+        self.converter_thread.progress_step.connect(self.loader_widget.set_progress_step)
         self.converter_thread.finished.connect(self._on_conversion_finished)
         self.converter_thread.start()
 
-    def _on_conversion_finished(self, success: bool, output_file: str, log_message: str):
+    def _on_conversion_finished(self, success: bool, output_files: list[str], log_message: str):
         self.loader_widget.hide()
-        self.drop_widget.show()
-        self.convert_btn.show()
+        self.drop_widget.hide()
+        self.banner_spacer.show()
 
         if success:
-            self.last_output_file = output_file
-            self.success_path_label.setText(f"File salvato in:\n{output_file}")
+            self.last_output_files = output_files
+            self.last_output_file = output_files[0] if output_files else ""
+            num_files = len(output_files)
+            
+            if num_files == 1:
+                self.success_title.setText("🎉 Conversione completata con successo!")
+                self.success_path_label.setText(f"File salvato in:\n{output_files[0]}")
+                self.success_path_label.show()
+                self.open_file_btn.show()
+            else:
+                self.success_title.setText(f"🎉 Conversione di {num_files} file completata con successo!")
+                self.success_path_label.setText("")
+                self.success_path_label.hide()
+                self.open_file_btn.hide()
+
+            # Show 'Apri Cartella' button ONLY if all converted files belong to the same parent directory
+            parent_folders = {str(Path(f).parent) for f in output_files if f}
+            self.open_folder_btn.setVisible(len(parent_folders) == 1)
+
             self.success_banner.show()
         else:
             self.last_log_output = log_message
-            # Display first 200 chars of error message
+            self.last_output_file = output_files[0] if output_files else ""
             short_msg = log_message.split("\nLog:")[0] if "\nLog:" in log_message else log_message
             self.error_desc_label.setText(short_msg[:300])
             self.error_banner.show()
+
+        # Show blue ConvertBtn outside banner to reset UI and convert more files
+        self.convert_btn.setText("🔄 Converti Altri Files...")
+        self.convert_btn.setEnabled(True)
+        self.convert_btn.show()
 
     def _open_output_file(self):
         if self.last_output_file and os.path.isfile(self.last_output_file):
@@ -351,13 +391,15 @@ class MainWindow(QMainWindow):
             dialog.exec()
 
     def _reset_ui(self):
-        self.drop_widget.clear_file()
+        self.drop_widget.clear_files()
         self.drop_widget.show()
         self.loader_widget.hide()
         self.convert_btn.show()
+        self.convert_btn.setText("Converti in PDF/A")
         self.convert_btn.setEnabled(False)
         self.success_banner.hide()
         self.error_banner.hide()
+        self.banner_spacer.hide()
         self.last_output_file = ""
         self.last_log_output = ""
 

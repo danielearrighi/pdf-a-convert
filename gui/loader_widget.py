@@ -22,6 +22,7 @@ class LoaderWidget(QFrame):
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 0)  # Indeterminate animated pulsing mode
         self.progress_bar.setTextVisible(False)
+        self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.status_label = QLabel("Avvio di Ghostscript...")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -31,6 +32,16 @@ class LoaderWidget(QFrame):
         layout.addWidget(self.status_label)
 
     def set_status(self, text: str):
+        self.status_label.setText(text)
+
+    def set_progress_step(self, current: int, total: int, text: str):
+        if total > 1:
+            self.progress_bar.setRange(0, total)
+            self.progress_bar.setValue(current)
+            self.progress_bar.setTextVisible(True)
+        else:
+            self.progress_bar.setRange(0, 0)
+            self.progress_bar.setTextVisible(False)
         self.status_label.setText(text)
 
     def apply_theme(self, theme: str):

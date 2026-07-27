@@ -8,14 +8,17 @@ Eseguibile e compatibile sia su **Linux** che su **Windows**.
 
 ## 🌟 Caratteristiche Principali
 
-- 📄 **Interfaccia Pulita e Semplice**: Trascina e rilascia (Drag & Drop) qualsiasi file `.pdf` oppure selezionalo con il pulsante "Sfoglia".
+- 📄 **Interfaccia Multi-File**: Trascina e rilascia (Drag & Drop) uno o più file `.pdf` contemporaneamente, oppure selezionali con il pulsante "Sfoglia File...".
+- 📑 **Elaborazione Batch**: Conversione sequenziale automatica di più file PDF con indicatore di progresso dedicato.
 - ⚙️ **Conversione PDF/A con Ghostscript**: Generazione automatica delle definizioni PostScript `PDFA_def.ps` e associazione dei profili colore ICC sRGB.
-- 🔄 **Loader e Feedback in Tempo Reale**: Animazione durante l'elaborazione e log dettagliato in caso di errori.
-- 📁 **Salvataggio Automatico**: Il file convertito viene salvato nella stessa cartella del file originale con il suffisso `-PdfA.pdf` (es. `documento.pdf` -> `documento-PdfA.pdf`).
+- 🔄 **Loader e Feedback in Tempo Reale**: Animazione con stato d'avanzamento per ogni file ed esame dei log dettagliati.
+- 📁 **Salvataggio Personalizzato**: I file convertiti vengono salvati nella stessa cartella dei file originali con un suffisso personalizzabile (default: `-pdfa`, es. `documento.pdf` -> `documento-pdfa.pdf`).
 - 🛠️ **Pannello Configurazione (Impostazioni)**:
+  - Personalizzazione del suffisso dei file convertiti.
   - Rilevamento automatico o manuale dell'eseguibile Ghostscript (`gs` / `gswin64c.exe`).
   - Rilevamento automatico o manuale del profilo colore sRGB ICC.
   - Selezione dello standard PDF/A (PDF/A-1b predefinito, PDF/A-2b).
+  - Selezione del tema grafico (Chiaro / Scuro).
   - Possibilità di aggiungere parametri Ghostscript extra.
   - Pulsante di test diagnostico per Ghostscript.
 

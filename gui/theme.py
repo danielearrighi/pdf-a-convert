@@ -41,10 +41,10 @@ def get_main_window_style(theme: str) -> str:
                 background-color: #0F172A;
             }
             #HeaderFrame {
-                background-color: #1E293B;
-                border: 1px solid #334155;
+                background-color: #1E3A8A;
+                border: 1px solid #3B82F6;
                 border-radius: 16px;
-                padding: 16px 12px;
+                padding: 16px 14px;
             }
             #MainContainer {
                 background-color: #1E293B;
@@ -72,15 +72,13 @@ def get_main_window_style(theme: str) -> str:
                 background-color: #064E3B;
                 border: 1px solid #10B981;
                 border-radius: 12px;
-                padding: 18px 10px;
-                min-height: 120px;
+                padding: 16px 14px;
             }
             #ErrorBanner {
                 background-color: #7F1D1D;
                 border: 1px solid #EF4444;
                 border-radius: 12px;
-                padding: 18px 10px;
-                min-height: 120px;
+                padding: 16px 14px;
             }
         """
     else:
@@ -89,10 +87,10 @@ def get_main_window_style(theme: str) -> str:
                 background-color: #F1F5F9;
             }
             #HeaderFrame {
-                background-color: #FFFFFF;
-                border: 1px solid #E2E8F0;
+                background-color: #2563EB;
+                border: 1px solid #1D4ED8;
                 border-radius: 16px;
-                padding: 16px 12px;
+                padding: 16px 14px;
             }
             #MainContainer {
                 background-color: #FFFFFF;
@@ -119,15 +117,13 @@ def get_main_window_style(theme: str) -> str:
                 background-color: #F0FDF4;
                 border: 1px solid #86EFAC;
                 border-radius: 12px;
-                padding: 18px 10px;
-                min-height: 120px;
+                padding: 16px 14px;
             }
             #ErrorBanner {
                 background-color: #FEF2F2;
                 border: 1px solid #FCA5A5;
                 border-radius: 12px;
-                padding: 18px 10px;
-                min-height: 120px;
+                padding: 16px 14px;
             }
         """
 
@@ -332,9 +328,8 @@ def get_drop_widget_style(theme: str) -> str:
                 background-color: #1E3A8A;
             }
             #DropAreaWidget[hasFile="true"] {
-                border-style: solid;
-                border-color: #10B981;
-                background-color: #064E3B;
+                border: 2px dashed #3B82F6;
+                background-color: #1E293B;
             }
         """
     else:
@@ -349,9 +344,8 @@ def get_drop_widget_style(theme: str) -> str:
                 background-color: #EFF6FF;
             }
             #DropAreaWidget[hasFile="true"] {
-                border-style: solid;
-                border-color: #10B981;
-                background-color: #F0FDF4;
+                border: 2px dashed #3B82F6;
+                background-color: #F8FAFC;
             }
         """
 
@@ -367,12 +361,18 @@ def get_loader_widget_style(theme: str) -> str:
             QProgressBar {
                 border: none;
                 background-color: #334155;
-                border-radius: 6px;
-                height: 10px;
+                border-radius: 7px;
+                height: 14px;
+                text-align: center;
+                margin-left: 8px;
+                margin-right: 8px;
+                font-size: 11px;
+                font-weight: bold;
+                color: #F8FAFC;
             }
             QProgressBar::chunk {
                 background-color: #3B82F6;
-                border-radius: 6px;
+                border-radius: 7px;
             }
         """
     else:
@@ -386,11 +386,17 @@ def get_loader_widget_style(theme: str) -> str:
             QProgressBar {
                 border: none;
                 background-color: #E2E8F0;
-                border-radius: 6px;
-                height: 10px;
+                border-radius: 7px;
+                height: 14px;
+                text-align: center;
+                margin-left: 8px;
+                margin-right: 8px;
+                font-size: 11px;
+                font-weight: bold;
+                color: #1E293B;
             }
             QProgressBar::chunk {
                 background-color: #3B82F6;
-                border-radius: 6px;
+                border-radius: 7px;
             }
         """
