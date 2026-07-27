@@ -218,12 +218,13 @@ class DropAreaWidget(QFrame):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll_area.setStyleSheet("background: transparent;")
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         self.scroll_widget = QWidget()
         self.scroll_widget.setStyleSheet("background: transparent;")
         self.items_layout = QVBoxLayout(self.scroll_widget)
-        self.items_layout.setContentsMargins(0, 0, 0, 0)
+        self.items_layout.setContentsMargins(0, 0, 4, 0)
         self.items_layout.setSpacing(6)
         self.items_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 

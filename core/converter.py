@@ -126,16 +126,30 @@ class PDFConverterThread(QThread):
                     all_logs.extend(file_logs)
                     all_logs.append("")
 
-                    if return_code == 0 and os.path.isfile(output_file):
+                    if return_code == 0 and os.path.isfile(output_file) and os.path.getsize(output_file) > 0:
                         successful_output_files.append(output_file)
                         self.progress_step.emit(idx, total_files, f"[{idx}/{total_files}] Completato: {input_path.name}")
                     else:
                         overall_success = False
-                        all_logs.append(f"ERRORE: Codice di uscita Ghostscript {return_code} per {input_path.name}")
+                        if return_code != 0:
+                            all_logs.append(f"ERRORE: Codice di uscita Ghostscript {return_code} per {input_path.name}")
+                        else:
+                            all_logs.append(f"ERRORE: Il file di output per {input_path.name} non è stato creato o è vuoto.")
+
+                        if os.path.exists(output_file):
+                            try:
+                                os.remove(output_file)
+                            except Exception as cleanup_err:
+                                all_logs.append(f"Impossibile rimuovere il file non valido '{output_file}': {cleanup_err}")
 
                 except Exception as e:
                     overall_success = False
                     all_logs.append(f"ECCEZIONE durante la conversione di {input_path.name}: {str(e)}")
+                    if os.path.exists(output_file):
+                        try:
+                            os.remove(output_file)
+                        except Exception as cleanup_err:
+                            all_logs.append(f"Impossibile rimuovere il file non valido '{output_file}': {cleanup_err}")
 
         full_log = "\n".join(all_logs)
 

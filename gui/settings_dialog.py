@@ -1,10 +1,11 @@
 import os
 import subprocess
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
     QPushButton, QFileDialog, QComboBox, QMessageBox, QGroupBox,
-    QStyledItemDelegate, QFrame
+    QStyledItemDelegate, QFrame, QScrollArea, QWidget
 )
 from core.config import ConfigManager
 from core.utils import find_ghostscript_executable, find_system_icc_profile
@@ -18,14 +19,37 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.config = config_manager
         self.setWindowTitle("Configurazione PDF/A Converter")
-        self.setMinimumWidth(620)
+        self.setMinimumWidth(640)
+        self.setMinimumHeight(380)
+
+        # Calculate initial target height based on available screen space
+        screen = QGuiApplication.primaryScreen()
+        ideal_height = 680
+        if screen:
+            avail_height = screen.availableGeometry().height()
+            target_height = min(ideal_height, int(avail_height * 0.85))
+        else:
+            target_height = ideal_height
+        self.resize(640, target_height)
         
         # Apply stylesheet based on current theme setting
         self.setStyleSheet(get_settings_dialog_style(self.config.theme))
 
         main_layout = QVBoxLayout(self)
-        main_layout.setSpacing(16)
-        main_layout.setContentsMargins(10, 20, 10, 20)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(10, 14, 10, 14)
+
+        # Scroll area for dialog content
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setSpacing(16)
+        scroll_layout.setContentsMargins(4, 4, 10, 4)
 
         # 1. Path Configuration Section
         paths_group = QGroupBox("Percorsi di Sistema")
@@ -108,7 +132,7 @@ class SettingsDialog(QDialog):
         icc_field_layout.addLayout(icc_box)
         paths_layout.addLayout(icc_field_layout)
 
-        main_layout.addWidget(paths_group)
+        scroll_layout.addWidget(paths_group)
 
         # 2. Conversion Options Section
         options_group = QGroupBox("Opzioni di Conversione")
@@ -164,7 +188,7 @@ class SettingsDialog(QDialog):
         extra_field_layout.addWidget(self.extra_args_edit)
         options_layout.addLayout(extra_field_layout)
 
-        main_layout.addWidget(options_group)
+        scroll_layout.addWidget(options_group)
 
         # 3. UI Theme Section
         theme_group = QGroupBox("Interfaccia e Tema")
@@ -197,7 +221,10 @@ class SettingsDialog(QDialog):
         theme_field_layout.addWidget(self.theme_combo)
         theme_layout.addLayout(theme_field_layout)
 
-        main_layout.addWidget(theme_group)
+        scroll_layout.addWidget(theme_group)
+
+        scroll_area.setWidget(scroll_content)
+        main_layout.addWidget(scroll_area, stretch=1)
 
         # 4. Bottom Utility Actions & Dialog Buttons
         bottom_layout = QHBoxLayout()
