@@ -53,6 +53,7 @@ class SettingsDialog(QDialog):
 
         # 1. Path Configuration Section
         paths_group = QGroupBox("Percorsi di Sistema")
+        paths_group.setMaximumHeight(260)
         paths_layout = QVBoxLayout(paths_group)
         paths_layout.setSpacing(14)
         paths_layout.setContentsMargins(8, 20, 8, 16)
@@ -136,6 +137,7 @@ class SettingsDialog(QDialog):
 
         # 2. Conversion Options Section
         options_group = QGroupBox("Opzioni di Conversione")
+        options_group.setMaximumHeight(340)
         options_layout = QVBoxLayout(options_group)
         options_layout.setSpacing(14)
         options_layout.setContentsMargins(8, 20, 8, 16)
@@ -192,6 +194,7 @@ class SettingsDialog(QDialog):
 
         # 3. UI Theme Section
         theme_group = QGroupBox("Interfaccia e Tema")
+        theme_group.setMaximumHeight(160)
         theme_layout = QVBoxLayout(theme_group)
         theme_layout.setSpacing(14)
         theme_layout.setContentsMargins(8, 20, 8, 16)
@@ -222,6 +225,7 @@ class SettingsDialog(QDialog):
         theme_layout.addLayout(theme_field_layout)
 
         scroll_layout.addWidget(theme_group)
+        scroll_layout.addStretch()
 
         scroll_area.setWidget(scroll_content)
         main_layout.addWidget(scroll_area, stretch=1)
