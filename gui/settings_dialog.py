@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QGuiApplication
@@ -8,7 +9,7 @@ from PyQt6.QtWidgets import (
     QStyledItemDelegate, QFrame, QScrollArea, QWidget
 )
 from core.config import ConfigManager
-from core.utils import find_ghostscript_executable, find_system_icc_profile
+from core.utils import find_ghostscript_executable, find_system_icc_profile, get_clean_env
 from gui.theme import get_settings_dialog_style, Theme
 
 class SettingsDialog(QDialog):
@@ -306,12 +307,18 @@ class SettingsDialog(QDialog):
 
     def _test_ghostscript(self):
         gs_path = self.gs_edit.text().strip()
-        if not gs_path or not os.path.isfile(gs_path):
+        resolved_path = gs_path
+        if not os.path.isfile(resolved_path):
+            found = shutil.which(gs_path)
+            if found:
+                resolved_path = found
+
+        if not resolved_path or not os.path.isfile(resolved_path):
             QMessageBox.critical(self, "Errore", "Il percorso di Ghostscript specificato non è un file valido.")
             return
 
         try:
-            res = subprocess.run([gs_path, "--version"], capture_output=True, text=True, timeout=5)
+            res = subprocess.run([resolved_path, "--version"], capture_output=True, text=True, timeout=5, env=get_clean_env())
             if res.returncode == 0:
                 ver = res.stdout.strip()
                 QMessageBox.information(self, "Test Ghostscript Riuscito", f"Ghostscript funziona correttamente!\n\nVersione rilevata: {ver}")
