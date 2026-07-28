@@ -4,7 +4,11 @@ from pathlib import Path
 
 def build():
     print("=== Compilazione Eseguibile PDF/A Converter con PyInstaller ===")
-    
+
+    # Su Windows PyInstaller richiede un .ico per generare l'icona dell'eseguibile/taskbar;
+    # un .png viene ignorato silenziosamente e resta l'icona di default di Python.
+    icon_path = "assets/app_icon.ico" if sys.platform == "win32" else "assets/app_icon.png"
+
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--noconfirm",
@@ -13,7 +17,7 @@ def build():
         "--onefile",  # Create single standalone executable
         "--name", "PDFA-Converter",
         "--add-data", "assets:assets",
-        "--icon", "assets/app_icon.png",
+        "--icon", icon_path,
         "main.py"
     ]
     

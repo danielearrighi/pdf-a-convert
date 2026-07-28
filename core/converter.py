@@ -88,6 +88,10 @@ class PDFConverterThread(QThread):
                     f"-sOutputFile={output_file}",
                 ]
 
+                if self.icc_path and os.path.isfile(self.icc_path):
+                    icc_path_ps = self.icc_path.replace("\\", "/")
+                    cmd.append(f"--permit-file-read={icc_path_ps}")
+
                 if self.extra_args.strip():
                     try:
                         extra_list = shlex.split(self.extra_args)
