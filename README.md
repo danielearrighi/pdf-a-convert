@@ -4,6 +4,8 @@ Applicazione desktop con interfaccia grafica (GUI) sviluppata in Python con PyQt
 
 Eseguibile e compatibile sia su **Linux** che su **Windows**.
 
+![PDF/A Converter](https://github.com/danielearrighi/pdf-a-convert/blob/b305c35372fd8a4370a5a7a47b9342bb8a15363b/images/Convertiore-Tema-Chiaro.png?raw=true)
+![PDF/A Converter](https://raw.githubusercontent.com/danielearrighi/pdf-a-convert/b305c35372fd8a4370a5a7a47b9342bb8a15363b/images/Convertiore-Tema-Scuro.png)
 ---
 
 ## 🌟 Caratteristiche Principali
